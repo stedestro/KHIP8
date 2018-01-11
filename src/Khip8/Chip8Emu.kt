@@ -33,7 +33,9 @@ class Chip8Emu {
     private var opcode: Int = 0x0
 
     /**
-     * Load font data at second constructor
+     * Secondary constructor:
+     *     Load font data
+     *     ...
      */
     init {
         val fonts = createFontSprite()

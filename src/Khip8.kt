@@ -16,7 +16,8 @@ fun main(args: Array<String>) {
                 println(instr)
         }
         "--emulate", "-e" -> {
-
+            val ui:Chip8Display = Chip8Display(args[1])
+            ui.isVisible = true
         }
         "--debug", "-d" -> {
             var emu = Chip8Emu()
