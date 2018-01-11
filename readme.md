@@ -1,5 +1,8 @@
 # KHIP
 Chip-8 Emulator and Disassembler in Kotlin
 
-## Description
-... 
+## Status
+Opcodes working
+"Working" screen
+No timers
+No keyboard

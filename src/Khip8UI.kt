@@ -9,6 +9,7 @@ import java.awt.event.WindowEvent
 import javax.swing.JFrame
 import javax.swing.JPanel
 import javax.swing.Timer
+import kotlin.concurrent.timer
 
 class Surface(chip8screen: Array<Array<Int>>) : JPanel() {
     private val SCREEN_HEIGHT = 32
@@ -26,7 +27,7 @@ class Surface(chip8screen: Array<Array<Int>>) : JPanel() {
                     g2d.paint = Color.black
                 else
                     g2d.paint = Color.white
-                g2d.drawLine(line, coln, line, coln)
+                g2d.drawLine(coln, line, coln, line)
             }
         }
     }
@@ -42,38 +43,43 @@ class Surface(chip8screen: Array<Array<Int>>) : JPanel() {
     }
 }
 
-class Chip8Display(rom: String) : JFrame() {
+class Chip8Display(rom: String) : JFrame(), ActionListener {
     private val SCREEN_WIDTH = 64
     private val SCREEN_HEIGHT = 32
+    private val CLOCK_SPEED = 16
     private val emu: Chip8Emu = Chip8Emu()
     private val surf: Surface = Surface(emu.getScreen())
+    private val clock:Timer = Timer(CLOCK_SPEED, this)
 
     init {
         emu.loadRom(rom)
         initUI()
         emulate()
+        clock.start()
     }
 
     private fun initUI() {
         add(surf)
 
+        addWindowListener(object : WindowAdapter(){
+            override fun windowClosed(p0: WindowEvent?) {
+                super.windowClosed(p0)
+                clock.stop()
+            }
+        })
+
         title = "KHIP-8"
-        setSize(SCREEN_WIDTH*2, SCREEN_HEIGHT*2)
+        setSize(SCREEN_WIDTH*2, SCREEN_HEIGHT*3)
         setLocationRelativeTo(null)
         defaultCloseOperation = JFrame.EXIT_ON_CLOSE
     }
 
     fun emulate() {
-        while (true) {
-            emu.emulateCycle()
-            if(emu.getChip8Opcode() == 0)
-                break;
-            paintScreen()
-        }
+        emu.emulateCycle()
+        surf.doPaint(emu.getScreen())
     }
 
-    fun paintScreen() {
-        val screen = emu.getScreen()
-        surf.doPaint(screen)
+    override fun actionPerformed(p0: ActionEvent?) {
+        emulate()
     }
 }
