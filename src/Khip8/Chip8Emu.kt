@@ -32,6 +32,8 @@ class Chip8Emu {
 
     private var opcode: Int = 0x0
 
+    public var shouldDraw:Boolean = false
+
     /**
      * Secondary constructor:
      *     Load font data
@@ -185,7 +187,7 @@ class Chip8Emu {
                 val n = opcode and 0xF
                 V[0xF] = 0
 
-                for (spriteByteIndex in 0..n) {
+                for (spriteByteIndex in 0 until n) {
                     val byte = memory[I + spriteByteIndex]
                     var pixIndex: Int = 0
                     for (pixel in 7 downTo 0) {
@@ -203,6 +205,7 @@ class Chip8Emu {
                     }
                 }
                 PC += 2
+                shouldDraw = true
             }
             0xE -> {
                 val x = opcode and 0xFFF shr 8
