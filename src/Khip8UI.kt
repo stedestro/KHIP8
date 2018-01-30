@@ -9,7 +9,6 @@ import java.awt.event.WindowEvent
 import javax.swing.JFrame
 import javax.swing.JPanel
 import javax.swing.Timer
-import kotlin.concurrent.timer
 
 class Surface(chip8screen: Array<Array<Int>>, screenScaling: Int) : JPanel() {
     private val SCREEN_HEIGHT = 32
@@ -23,6 +22,10 @@ class Surface(chip8screen: Array<Array<Int>>, screenScaling: Int) : JPanel() {
 
         for (line in 0 until SCREEN_HEIGHT * screenScaling) {
             for (coln in 0 until SCREEN_WIDTH * screenScaling) {
+                if(line > SCREEN_HEIGHT*screenScaling)
+                    throw Exception("Line is $line")
+                else if (coln > SCREEN_WIDTH*screenScaling)
+                    throw Exception("Coln is $coln")
                 if (chip8screen[line][coln] == 0)
                     g2d.paint = Color.black
                 else
@@ -74,7 +77,7 @@ class Chip8Display(rom: String, screenScaling: Int = 3) : JFrame() {
         })
 
 
-        title = "KHIP-8"
+        title = "KHIP8"
         setSize(SCREEN_WIDTH * screenScaling + 16, SCREEN_HEIGHT * screenScaling + 39)
         setLocationRelativeTo(null)
         defaultCloseOperation = JFrame.EXIT_ON_CLOSE

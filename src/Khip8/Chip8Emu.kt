@@ -1,11 +1,13 @@
 package Khip8
 
+import java.awt.event.ActionEvent
+import java.awt.event.ActionListener
 import java.nio.file.Files
 import java.nio.file.Path
 import java.nio.file.Paths
 import java.util.*
 import java.util.concurrent.ThreadLocalRandom
-import kotlin.concurrent.timerTask
+import javax.swing.Timer
 
 
 class Chip8Emu {
@@ -30,6 +32,18 @@ class Chip8Emu {
     private var memory: IntArray = IntArray(RAM_SIZE, { 0 })
     private var screen: Array<Array<Int>> = Array(SCREEN_HEIGHT, { Array(SCREEN_WIDTH, { 0 }) })
 
+    // TIMERS
+    private val delayTimer: Timer = Timer(16, object : ActionListener {
+        override fun actionPerformed(p0: ActionEvent?) {
+            timerAction(0)
+        }
+    })
+    private val soundTimer: Timer = Timer(16, object : ActionListener {
+        override fun actionPerformed(p0: ActionEvent?) {
+            timerAction(1)
+        }
+    })
+
     private var opcode: Int = 0x0
 
     public var shouldDraw:Boolean = false
@@ -43,6 +57,29 @@ class Chip8Emu {
         val fonts = createFontSprite()
         for (byte in fonts.indices)
             memory[byte] = fonts[byte]
+    }
+
+    fun timerAction(timer:Int){
+        when(timer){
+            0 -> {
+                DT--
+                if(DT == 0)
+                    delayTimer.stop()
+                else if (DT < 0){
+                    DT = 0
+                    delayTimer.stop()
+                }
+            }
+            1 -> {
+                ST--
+                if(ST == 0)
+                    soundTimer.stop()
+                else if (ST < 0){
+                    ST = 0
+                    soundTimer.stop()
+                }
+            }
+        }
     }
 
     /**
@@ -252,12 +289,12 @@ class Chip8Emu {
                     }
                     0x15 -> { // LD DT, Vx
                         DT = V[x]
-                        // <- START DELAY TIMER HERE!!!!
+                        delayTimer.start()
                         PC += 2
                     }
                     0x18 -> { // LD ST, Vx
                         ST = V[x]
-                        // <- START SOUND TIMER HERE!!!!
+                        soundTimer.start()
                         PC += 2
                     }
                     0x1E -> { // ADD I, Vx
@@ -265,7 +302,8 @@ class Chip8Emu {
                         PC += 2
                     }
                     0x29 -> { // LD F, Vx
-
+                        I = V[x] * 5
+                        PC += 2
                     }
                     0x33 -> { // LD B, Vx
                         memory[I] = V[x] / 100
