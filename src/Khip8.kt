@@ -16,7 +16,10 @@ fun main(args: Array<String>) {
                 println(instr)
         }
         "--emulate", "-e" -> {
-            val ui:Chip8Display = Chip8Display(args[1], screenScaling = 4)
+            var scale:Int = 4
+            if(args.size == 3)
+                scale = args[2].toInt()
+            val ui:Chip8Display = Chip8Display(args[1], screenScaling = scale)
             ui.isVisible = true
         }
         "--debug", "-d" -> {
